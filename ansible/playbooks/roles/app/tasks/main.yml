@@ -18,7 +18,7 @@
   
 - name: start or restart the backend
   become: yes
-  command: "python3 /opt/todo-app/app.py"
+  shell: "nohup python3 app.py > app.log 2>&1 &"
   args:
     chdir: /opt/todo-app
   when: start_py.stat.exists
