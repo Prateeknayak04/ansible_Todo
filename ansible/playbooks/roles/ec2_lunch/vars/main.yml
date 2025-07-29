@@ -1,0 +1,6 @@
+---
+# vars file for ec2_lunch
+aws_region: ap-south-1
+ec2_instance_type: t2.micro
+ec2_ami_id: ami-0b32d400456908bf9
+ec2_key_name: test-demo
