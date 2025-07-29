@@ -23,9 +23,9 @@
     chdir: /opt/todo-app
   when: start_py.stat.exists
 
-- name: Set pip to start 
-  become: yes
-  command: "python3 app.py"
-  args:
-    chdir: /opt/todo-app
+# - name: Set pip to start 
+#   become: yes
+#   command: "python3 app.py"
+#   args:
+#     chdir: /opt/todo-app
 
