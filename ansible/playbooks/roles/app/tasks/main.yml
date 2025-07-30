@@ -16,7 +16,7 @@
   debug:
     var: "{{ start_py.stat.exists }}"
   
-- name: start or restart the backend
+- name: start or restart the App
   become: yes
   shell: "nohup python3 app.py > app.log 2>&1 &"
   args:
@@ -28,4 +28,3 @@
 #   command: "python3 app.py"
 #   args:
 #     chdir: /opt/todo-app
-
