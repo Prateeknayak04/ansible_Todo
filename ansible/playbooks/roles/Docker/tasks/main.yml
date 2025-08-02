@@ -56,6 +56,13 @@
     state: present
   become: yes
 
+- name: runnig compose file
+  become: yes 
+  shell: docker compose up -d
+  args:
+    chdir: /opt/todo-app
+
+
 
 
 
