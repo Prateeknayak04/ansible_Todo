@@ -5,7 +5,7 @@
   package:
     name: docker
     state: present
-  notify: Restart Docker Services
+  notify: Restart Docker Service
 
 - name: start and enable docker
   become: yes
