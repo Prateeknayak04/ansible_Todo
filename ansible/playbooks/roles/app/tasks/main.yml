@@ -1,0 +1,30 @@
+---
+# tasks file for app
+- name: Install required backend object
+  become: yes
+  pip:
+    name:
+      - flask
+    state: present
+
+- name: Check the app.py file is present or not
+  stat:
+    path: /opt/todo-app/app.py
+  register: start_py
+
+- name: Debugging app file
+  debug:
+    var: "{{ start_py.stat.exists }}"
+  
+- name: start or restart the App
+  become: yes
+  shell: "nohup python3 app.py > app.log 2>&1 &"
+  args:
+    chdir: /opt/todo-app
+  when: start_py.stat.exists
+
+# - name: Set pip to start 
+#   become: yes
+#   command: "python3 app.py"
+#   args:
+#     chdir: /opt/todo-app
