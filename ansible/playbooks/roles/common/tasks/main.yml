@@ -38,7 +38,7 @@
   set_fact:
     secret_key: "{{ lookup('env', 'SECRET') }}"
 
-- name: Create .env file
+- name: Create .env file in remote instance
   become: yes
   copy:
     dest: /opt/todo-app/.env
