@@ -39,6 +39,6 @@
     dest: /opt/todo-app/.env
     content: |
       SECRET_KEY={{ lookup('env', 'SECRET') }}
-  mode: '0600'
+    mode: '0600'
 
   
