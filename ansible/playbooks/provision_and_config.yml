@@ -1,4 +1,4 @@
-- name: Provision and config roles
+- name: Provision and configure roles
   hosts: localhost
   gather_facts: no
   roles:
