@@ -35,6 +35,7 @@
       - "--exclude=ansible"
 
 - name: Create .env file
+  become: yes
   copy:
     dest: /opt/todo-app/.env
     content: |
