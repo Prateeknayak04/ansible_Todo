@@ -34,12 +34,16 @@
       - "--exclude=.github"
       - "--exclude=ansible"
 
+- name: Set secret key Variable
+  set_fact:
+    secret_key: "{{ lookup('env', 'SECRET') }}"
+
 - name: Create .env file
   become: yes
   copy:
-    dest: /opt/todo-app/.env/
+    dest: /opt/todo-app/.env
     content: |
-      SECRET_KEY={{ lookup('env', 'SECRET') }}
+      SECRET_KEY={{ secret_key }}
     mode: '0600'
 
   
