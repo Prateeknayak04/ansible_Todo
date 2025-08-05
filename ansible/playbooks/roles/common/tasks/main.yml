@@ -37,7 +37,7 @@
 - name: Create .env file
   become: yes
   copy:
-    dest: /opt/todo-app/.env
+    dest: /opt/todo-app/.env/
     content: |
       SECRET_KEY={{ lookup('env', 'SECRET') }}
     mode: '0600'
