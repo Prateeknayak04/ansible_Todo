@@ -44,6 +44,8 @@
     dest: /opt/todo-app/.env
     content: |
       SECRET_KEY={{ secret_key }}
+    owner: "{{ ansible_user }}"
+    group: docker
     mode: '0600'
 
   
