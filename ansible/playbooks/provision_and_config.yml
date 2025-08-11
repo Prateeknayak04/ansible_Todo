@@ -1,0 +1,14 @@
+- name: Provision and configure roles
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - ec2_lunch
+
+- name: Configuration of Ec2 instance
+  hosts: lunched_ec2_instances
+  gather_facts: yes
+  roles:
+    - common
+    # - app
+    - Docker
+

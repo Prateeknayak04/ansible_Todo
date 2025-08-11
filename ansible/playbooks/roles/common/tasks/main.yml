@@ -1,0 +1,50 @@
+---
+
+- name: Install common Packages
+  become: yes
+  package:
+    name:
+      - httpd
+      - nginx
+    state: present
+
+- name: start the service
+  become: yes
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: install pip 
+  become: yes
+  package:
+    name: python3-pip
+    state: present
+
+- name: copy source code 
+  become: yes
+  synchronize:
+    src: "{{ playbook_dir }}/../../"
+    dest: "/opt/todo-app"
+    delete: yes
+    recursive: yes
+    rsync_opts: 
+      - "--exclude=.git"
+      - "--exclude=.github"
+      - "--exclude=ansible"
+
+- name: Set secret key Variable
+  set_fact:
+    secret_key: "{{ lookup('env', 'SECRET') }}"
+
+- name: Create .env file in remote instance
+  become: yes
+  copy:
+    dest: /opt/todo-app/.env
+    content: |
+      SECRET_KEY={{ secret_key }}
+    owner: "{{ ansible_user }}"
+    group: ec2-user
+    mode: '0644'
+
+  

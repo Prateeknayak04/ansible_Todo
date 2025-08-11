@@ -1,0 +1,17 @@
+---
+# vars file for ec2_lunch
+aws_region: ap-south-1
+ec2_instance_type: t2.micro
+ec2_ami_id: ami-0b32d400456908bf9
+ec2_key_name: test-demo
+ec2_instance_count: 1
+ec2_vpc_id: vpc-04550d2e519f89bca
+
+security_group_rules:
+  - proto: tcp
+    ports: [22, 5000]
+    cidr_ip: 0.0.0.0/0
+    
+  - proto: tcp
+    ports: [443, 8080]
+    cidr_ip: 0.0.0.0/0

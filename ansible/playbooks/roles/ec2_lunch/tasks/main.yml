@@ -1,0 +1,94 @@
+---
+# tasks file for ec2_lunch
+- name: Get information about existing instance
+  amazon.aws.ec2_instance_info:
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Name": "Ansible-created-instance-*"
+      instance-state-name: ["running", "pending"]
+  register: existing_instance
+
+- name: Calculating number of instance to lunch 
+  set_fact:
+    instances_to_launch: "{{ ec2_instance_count|int - existing_instance.instances|length }}" 
+
+
+- name: define security group
+  amazon.aws.ec2_security_group:
+    name: test-ansible-dynamic 
+    description: security instance for ec2 instance
+    vpc_id: "{{ ec2_vpc_id }}"
+    region: "{{ aws_region }}"
+    # state: absent
+    rules: "{{ security_group_rules }}"
+      # - proto: tcp
+      #   from_port: 8080
+      #   to_port: 8080
+      #   cidr_ip: 0.0.0.0/0
+      # - proto: tcp
+      #   from_port: 443
+      #   to_port: 443
+      #   cidr_ip: 0.0.0.0/0
+      # - proto: tcp
+      #   from_port: 5000
+      #   to_port: 5000
+      #   cidr_ip: 0.0.0.0/0
+      # - proto: tcp 
+      #   from_port: 22
+      #   to_port: 22
+      #   cidr_ip: 0.0.0.0/0
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+  register: security_group
+
+- name: Lunch a ec2 instance
+  amazon.aws.ec2_instance:
+    name: "Ansible-created-instance-{{existing_instance.instances|length + item }}"
+    key_name: "{{ ec2_key_name }}"
+    region: "{{ aws_region }}"
+    instance_type: "{{ ec2_instance_type }}"
+    image_id: "{{ ec2_ami_id }}"
+    count: "{{ ec2_instance_count }}"
+    security_group: "{{ security_group.group_id }}"
+    # state: absent
+    wait: yes
+    network: 
+      assign_public_ip: yes
+  register: ec2
+  loop: "{{ range(1, instances_to_launch|int + 1)|list }}"
+  when: instances_to_launch|int > 0
+
+- name: Combine existing and new instances
+  set_fact:
+    all_instances: "{{existing_instance.instances + ( ec2.results|default([]) | map(attribute='instances')|flatten) }}"
+
+- name: wait for the instances to be ready 
+  wait_for:
+    host: "{{ item.public_dns_name }}"
+    # host: "{{ ec2.instances[0].public_dns_name }}"
+    port: 22
+    delay: 30
+    timeout: 300
+    state: started
+  loop: "{{ all_instances }}"
+  # when: ec2.instances is defined and ec2.instances | length > 0
+
+- name: Add ec2 instance dynamically
+  add_host:
+    name: "{{ item.public_dns_name }}"
+    # name: "{{ec2.instances[0].public_dns_name}}"
+    groups: launched_ec2_instances
+    ansible_ssh_private_key_file: "{{ ec2_ssh_key_path }}"
+    ansible_user: ec2-user
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  loop: "{{ all_instances }}"
+
+- name: debug dynamic inventory
+  debug: 
+    var: ec2_ssh_key_path
+
+- name: debug dynamic inventory
+  debug: 
+    # var: groups['lunched_ec2_instances']
+    msg: "All Instances: {{ groups['launched_ec2_instances'] }}"
